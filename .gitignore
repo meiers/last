@@ -3,5 +3,10 @@
 ChangeLog.txt
 doc/*.html
 src/version.hh
-
+/*/src/last-merge-batches
+/*/src/last-split
+/*/src/lastal
+/*/src/lastdb
+/*/src/lastex
+/*/src/version.hh
 
