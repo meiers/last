@@ -142,6 +142,7 @@ Options:\n\
 int main(int argc, char* argv[]) {
   try {
     run(argc, argv);
+    if (!flush(std::cout)) throw std::runtime_error("write error");
     return EXIT_SUCCESS;
   } catch (const std::bad_alloc& e) {  // bad_alloc::what() may be unfriendly
     std::cerr << argv[0] << ": out of memory\n";

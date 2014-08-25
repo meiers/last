@@ -10,7 +10,10 @@
 # result is too faint.  How can this be done better?
 
 import sys, os, re, itertools, optparse
-import Image, ImageDraw, ImageFont, ImageColor
+
+# Try to make PIL/PILLOW work:
+try: from PIL import Image, ImageDraw, ImageFont, ImageColor
+except ImportError: import Image, ImageDraw, ImageFont, ImageColor
 
 my_name = os.path.basename(sys.argv[0])
 usage = """

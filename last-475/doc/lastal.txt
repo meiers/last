@@ -316,7 +316,9 @@ Miscellaneous Options
       PSSMs, for the queries.  0 means read queries in fasta format
       (without quality scores); 1 means fastq-sanger format; 2 means
       fastq-solexa format; 3 means fastq-illumina format; 4 means prb
-      format; 5 means read PSSMs.
+      format; 5 means read PSSMs.  (Warning: Illumina data is not
+      necessarily in fastq-illumina format; it is often in
+      fastq-sanger format.)
 
       The fastq formats look like this:
 
