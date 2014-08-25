@@ -397,6 +397,66 @@ void alignGapless( SegmentPairPot& gaplessAlns,
   LOG( "gapless alignments=" << gaplessAlignmentCount );
 }
 
+// meiers
+void outputDots(char strand, std::ostream& out ){
+  Dispatcher dis( Phase::gapless );
+  DiagonalTable dt;  // record already-covered positions on each diagonal
+
+  for( indexT i = 0; i < query.finishedSize(); i += args.queryStep ){
+    bool printHeader=false;
+    for( unsigned x = 0; x < numOfIndexes; ++x ){
+      const indexT* beg;
+      const indexT* end;
+      suffixArrays[x].match( beg, end, dis.b + i, dis.a,
+           args.oneHitMultiplicity, args.minHitDepth );
+
+      for(; beg < end; ++beg ){  // loop over suffix-array matches
+
+  // removed the "gaplessAlignmentsPerQueryPosition" constraint
+
+  indexT j = *beg;  // coordinate in the reference sequence
+
+  if( dt.isCovered( i, j ) ) continue;
+
+  int fs = dis.forwardGaplessScore( j, i );
+  int rs = dis.reverseGaplessScore( j, i );
+  int score = fs + rs;
+
+  if( score < minScoreGapless ) continue;
+
+  indexT tEnd = dis.forwardGaplessEnd( j, i, fs );
+  indexT tBeg = dis.reverseGaplessEnd( j, i, rs );
+  indexT qBeg = i - (j - tBeg);
+  if( !dis.isOptimalGapless( tBeg, tEnd, qBeg ) ) continue;
+  SegmentPair sp( tBeg, qBeg, tEnd - tBeg, score );
+  dt.addEndpoint( sp.end2(), sp.end1() );
+
+  // meiers: print coordinates relative to the forward strand
+  indexT dbID = text.whichSequence(tBeg);
+  tBeg = tBeg - text.seqBeg(dbID);
+
+  indexT quID = query.whichSequence( strand=='+' ? qBeg : query.finishedSize() - qBeg );
+  qBeg = strand == '+' ? qBeg - query.seqBeg(quID) : query.seqEnd(quID) - query.seqBeg(quID) - qBeg -1;
+
+  indexT al_len = sp.end1() - sp.beg1();
+
+  if (!printHeader) { 
+    if (strand=='+')  out << "> " << query.seqName(quID) << std::endl;
+    else              out << "> " << query.seqName(quID) << " Reverse" << std::endl;
+    printHeader=true;
+  }
+
+  // 1-based coordinates because mummer does so, too.
+  out << tBeg+1 << "\t" << qBeg+1 << "\t" << al_len << "\t" << score << std::endl;  
+      }
+    }
+  }
+}
+
+
+
+
+
 // Shrink the SegmentPair to its longest run of identical matches.
 // This trims off possibly unreliable parts of the gapless alignment.
 // It may not be the best strategy for protein alignment with subset
@@ -547,6 +607,12 @@ void makeQualityPssm( bool isApplyMasking ){
 void scan( char strand, std::ostream& out ){
   if( args.outputType == 0 ){  // we just want match counts
     countMatches( strand );
+    return;
+  }
+
+  // meiers: Call new dotplot function and exit
+  if (args.outputType == 99) {
+    outputDots(strand, out);
     return;
   }
 
