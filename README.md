@@ -1,4 +1,4 @@
 last
 ====
 
-Clone of LAST, see http://last.cbrc.jp/last/ (Mercurial repo)
+Clone of LAST version 473, see http://last.cbrc.jp/last/ (Mercurial repo)
